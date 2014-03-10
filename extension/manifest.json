@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "ClickOnce Helper",
     "short_name": "ClickOnce",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "Enables ClickOnce apps to launch seamlessly from Google Chrome™.",
 
     "icons": {

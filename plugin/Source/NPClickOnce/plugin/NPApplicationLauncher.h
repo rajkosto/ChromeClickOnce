@@ -17,4 +17,5 @@ public:
 private:
 	NPIdentifier launchIdentifier;
 	NPIdentifier versionString;
+	NPIdentifier clrVersionString;
 };

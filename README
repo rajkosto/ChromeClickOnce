@@ -1,3 +1,8 @@
 Chrome extension to enable seamless launching of ClickOnce applications.
-
 Based on https://code.google.com/p/clickonceforchrome/
+
+A sample that detects .net framework version and presence of ClickOnce support, as well as launching the extension installer, for both IE, Chrome and Firefox is in the sample dir
+
+CHANGELOG:
+	1.1.0 
+		- added clrVersion property to the embed object that contains all the .net framework versions in the same format as X-ClickOnceSupport
