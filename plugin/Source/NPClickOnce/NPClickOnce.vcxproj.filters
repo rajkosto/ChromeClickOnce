@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="plugin">
+      <UniqueIdentifier>{7be8f5a9-ee7e-411e-960e-f7bd236ddeb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="npapi">
+      <UniqueIdentifier>{59abcf9c-3ce7-403d-955d-f11bf0574853}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="plugin\NPClickOnce.h">
+      <Filter>plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="plugin\NPScriptableObject.h">
+      <Filter>plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="plugin\NPApplicationLauncher.h">
+      <Filter>plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="npapi\npapi.h">
+      <Filter>npapi</Filter>
+    </ClInclude>
+    <ClInclude Include="npapi\npfunctions.h">
+      <Filter>npapi</Filter>
+    </ClInclude>
+    <ClInclude Include="npapi\npruntime.h">
+      <Filter>npapi</Filter>
+    </ClInclude>
+    <ClInclude Include="npapi\nptypes.h">
+      <Filter>npapi</Filter>
+    </ClInclude>
+    <ClInclude Include="WinApi.h" />
+    <ClInclude Include="resource.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="plugin\NPClickOnce.cpp">
+      <Filter>plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="plugin\NPApplicationLauncher.cpp">
+      <Filter>plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="DllMain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="NPClickOnce.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="exports.def" />
+  </ItemGroup>
+</Project>
