@@ -3,186 +3,9 @@
 	<title>ClickOnce detection test</title>
 	<link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/mdooolbdbmjaobhdondofgdmnbidlgfh" />
 	<script src="http://code.jquery.com/jquery-1.11.0.js"></script>
+	<script src="clickonce.js"></script>
 	<script type="text/javascript">
-		function getIeVersion()
-		{
-		    var undef,rv = -1; // Return value assumes failure.
-		    var ua = window.navigator.userAgent;
-		    var msie = ua.indexOf('MSIE ');
-		    var trident = ua.indexOf('Trident/');
 
-		    if (msie > 0) {
-		        // IE 10 or older => return version number
-		        rv = parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-		    } else if (trident > 0) {
-		        // IE 11 (or newer) => return version number
-		        var rvNum = ua.indexOf('rv:');
-		        rv = parseInt(ua.substring(rvNum + 3, ua.indexOf('.', rvNum)), 10);
-		    }
-
-		    return ((rv > -1) ? rv : undef);
-		}
-
-		function setupLauncherLinks(specialDiv, launchLinks, specialUa)
-		{
-			var onWindows = (window.navigator.platform.indexOf('Win') === 0);
-			if (!onWindows)
-			{
-				specialDiv.html('You need to be running Windows!');
-				return;
-			}
-
-			var dotNetVersion = 0;
-			var hasClickOnce = false;
-
-			var ua = window.navigator.userAgent; //newer IE actually don't expose .net versions in HTTP userAgent, just here
-			if (specialUa != null) //the Firefox ClickOnce plugin was installed when the page was requested
-			{
-				ua = specialUa;
-				hasClickOnce = true;
-			}
-
-			var ieVersion = getIeVersion();
-			var isIe = (ieVersion > 0);
-			if (!isIe && !hasClickOnce)
-			{
-				//we need to find out if there's a plugin handling ClickOnce on other browsers
-				var mimeHandler = window.navigator.mimeTypes["application/x-ms-application"];
-				if (mimeHandler != null && mimeHandler.enabledPlugin != null) //ClickOnce via plugin
-				{
-					hasClickOnce = true;
-
-					var embed = document.createElement('embed');
-					embed.setAttribute('type', 'application/x-ms-application');
-					embed.setAttribute('width', 0); embed.setAttribute('height', 0);
-					document.body.appendChild(embed); //plugins dont usually instantiate untill they are in the doc
-
-					if (typeof (embed.clrVersion) == 'string') //this plugin supports fetching .net versions
-					{
-						specialUa = embed.clrVersion;
-						ua = specialUa;
-					}
-
-					if (embed.parentNode) { embed.parentNode.removeChild(embed); }
-				}
-			}
-
-			if (ua.indexOf('.NET4') >= 0)
-			{
-				dotNetVersion = 4;
-			}
-			else if (ua.indexOf('.NET CLR 3') >= 0)
-			{
-				dotNetversion = 3;
-			}
-			else if (ua.indexOf('.NET CLR 2') >= 0)
-			{
-				dotNetVersion = 2;
-			}
-			else if (ua.indexOf('.NET CLR 1') >= 0)
-			{
-				dotNetVersion = 1;
-			}
-			
-			if (isIe)
-			{
-				if (dotNetVersion >= 2) //all IE after .net 2 has ClickOnce support
-				{
-					hasClickOnce = true;
-				}
-				else
-				{
-					hasClickOnce = false;
-				}
-			}
-
-			//if we didn't find any .net, we can't trust the check unless we're on IE (or specialUa)
-			var skipDotNetCheck = false;
-			if (isIe)
-			{
-				skipDotNetCheck = false;
-			}
-			else if (dotNetVersion == 0)
-			{
-				if (specialUa == null)
-				{
-					skipDotNetCheck = true;
-				}
-				else //we have specialUa, so we know exactly what CLR are installed
-				{
-					skipDotNetCheck = false;
-				}
-			}
-
-			if (!skipDotNetCheck && (dotNetVersion < 4))
-			{
-				specialDiv.html('Please install .net framework 4.0 client profile');
-				return;
-			}
-
-			if (!hasClickOnce)
-			{
-				specialDiv.html('Install the ClickOnce extension by clicking <a href="#" class="extension-link">HERE</a>')
-				var extLink = specialDiv.children('.extension-link');
-
-				if (typeof chrome == 'object' && typeof(chrome.webstore) == 'object') //we can install the chrome extension
-				{
-					var clickHandlerChrome = function()
-					{
-						chrome.webstore.install("https://chrome.google.com/webstore/detail/mdooolbdbmjaobhdondofgdmnbidlgfh", 
-							function()
-							{
-								//Refresh the page to re-run all the checks (.net framework and such)
-								window.location.reload();
-							},
-							function(err)
-							{
-								specialDiv.html('Error adding ClickOnce to Chrome: ' + err + ' ');
-								extLink.html('Try again');
-								extLink.on("click", clickHandlerChrome);
-								specialDiv.append(extLink);
-							});
-
-						return false;
-					};
-
-					extLink.on("click", clickHandlerChrome);
-				}
-				else if (typeof (InstallTrigger) == 'object') //we are on Firefox
-				{
-					extLink.attr('href',"https://addons.mozilla.org/firefox/downloads/latest/9449/platform:5/addon-9449-latest.xpi");
-					var clickHandlerFirefox = function()
-					{
-						specialDiv.html('Please accept the extension installation to continue');
-						return true;
-					};
-
-					extLink.on("click", clickHandlerFirefox);
-				}
-				else
-				{
-					specialDiv.html('You are running an unsupported browser. The launch links might not work.');
-					launchLinks.show();
-				}
-			}
-			else
-			{
-				if (skipDotNetCheck) //we arent sure what .net they have, so display notice anyway
-				{
-					specialDiv.html("Make sure you have .net framework 4.0 client profile, as we don't know");
-				}
-				else
-				{
-					specialDiv.html('Everything good to go! Your .net framework version is ' + dotNetVersion);
-				}
-				launchLinks.show();
-			}
-		}
-
-		function instNoticeSel()
-		{
-			return $('#install-notice');
-		}
 		function launcherLinksSel()
 		{
 			return $('.launcher-link');
@@ -200,7 +23,86 @@
 		{
 			$(document).ready(function()
 				{
-					setupLauncherLinks(instNoticeSel(), launcherLinksSel(), specialUa)
+					var minimumNetVer = 4.0;
+					var utilFunc = function(evt)
+					{
+						var specialDiv = $('#install-notice');
+						var code = evt.code;
+						if (code == 'NOTWIN')
+						{
+							specialDiv.html('You need to be on Windows');
+							return;
+						}
+						else if (code == 'INVCLR')
+						{
+							var installNotice = 'This application requires .net ' + minimumNetVer.toFixed(1) + '. ';
+							if (evt.clrVersion > 0)
+								installNotice += 'You currently have version ' + evt.clrVersion.toFixed(1) + '.';
+							else
+								installNotice += "You don't have any .net version installed.";
+
+							installNotice += ' Please install .net manually or use the ClickOnce bootstrapper exe.'; 
+
+							specialDiv.html(installNotice);
+							return;
+						}
+						else if (code == 'EXTLINK')
+						{
+							specialDiv.html('Install the ClickOnce extension by clicking <a href="#" class="extension-link">HERE</a>')
+							var extLink = specialDiv.children('.extension-link');
+							return extLink;
+						}
+						else if (code == 'EXTSTART')
+						{
+							specialDiv.html('Please accept the extension installation to continue'); 
+							return;
+						}
+						else if (code == 'EXTDONE') //installation successfull in Chrome
+						{
+							window.location.reload(); //to run all the .net checks again
+							return;
+						}
+						else if (code == 'EXTERR') //installation cancelled in Chrome
+						{
+							specialDiv.html('Error installing extension: ' + evt.errMsg + ' <a href="#" class="extension-link">Try again</a>');
+							var extLink = specialDiv.children('.extension-link');
+							return extLink;
+						}
+						else if (code == 'DONE')
+						{
+							var showSetupExe = false;
+							if (!evt.clickOnce)
+							{
+								specialDiv.html('You are running an unsupported browser. The launch links might not work.');
+								showSetupExe = true;
+							}
+							else if (evt.clrSkipped)
+							{
+								specialDiv.html("Use the ClickOnce bootstrapper exe, if you aren't sure that you already have .net " + minimumNetVer.toFixed(1));
+								showSetupExe = true;
+							}									
+							else
+							{
+								specialDiv.html('Everything good to go! Your .net framework version is ' + evt.clrVersion.toFixed(1));							
+							}
+
+							var launchLinks = launcherLinksSel();
+							launchLinks.show();
+
+							var setupExeSel = $('#setupexe');
+
+							if (showSetupExe)
+								setupExeSel.show();
+							else
+								setupExeSel.hide();
+
+							return;
+						}
+
+						return;
+					};
+
+					checkClickOnce(specialUa, minimumNetVer, utilFunc);
 				});
 		}
 	</script>
@@ -209,6 +111,7 @@
 	<p>
 		This is the install notice: <span id="install-notice">Waiting for ClickOnce and .net framework checks...</span>
 	</p>
+	<p id="setupexe">This is the boostrapper link: <a href="https://localhost/setup.exe">Install SampleApp</a></p>
 	<p>
 		This is a launch link: <a class="launcher-link" href="http://localhost/SampleApp.application?value=test">Launch test app with param</a>
 	</p>
